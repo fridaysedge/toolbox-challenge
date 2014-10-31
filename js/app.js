@@ -1,70 +1,9 @@
 
 $(document).ready(function(){
+    
 
-    // select a random set of 8 tiles from the full set of 32 tiles.
-    var tiles = [];
-    var idx;
-
-    // Create all of the potential playing cards
-    for(idx = 1; idx <= 32; ++idx){
-        tiles.push({
-            tileNum: idx,
-            src: 'img/tile' + idx + '.jpg'
-        });
-    }
-
-    // Create a new "shuffled" set of those cards
-    var shuffledTiles = _.shuffle(tiles);
-
-    // Select the first eight cards in that set
-    var selectedTiles = shuffledTiles.slice(0, 8);
-
-    // Create the set of "paired" cards that will be used for playing
-    var tilePairs = [];
-    _.forEach(selectedTiles, function(tile){
-        tilePairs.push(_.clone(tile));
-        tilePairs.push(_.clone(tile));
-    });
-
-    // Shuffle the playing set
-    tilePairs = _.shuffle(tilePairs);
-
-    // Dynamically create the game board
-    var gameBoard = $('#game-board');
-    var row = $(document.createElement('div'));
-    var img;
-    _.forEach(tilePairs, function(tile, elemIndex){
-
-        if(elemIndex > 0 && 0 == elemIndex %4){
-            gameBoard.append(row);
-            row = $(document.createElement('div'));
-        };
-       img = $(document.createElement('img'));
-        img.attr({
-            src: 'img/tile-back.png',
-            alt: 'image of tile ' + tile.tileNum
-        });
-        img.data('tile', tile);
-        row.append(img);
-    });
-
-    gameBoard.append(row);
-
-
-    //
-    $('#game-board img').click(function(){
-       var img = $(this);
-       var tile = img.data('tile');
-       img.fadeOut(100, function(){
-            if(tile.flipped){
-                img.attr('src', 'img/tile-back.png');
-            }else{
-                img.attr('src', tile.src);
-            }
-            tile.flipped = !tile.flipped;
-            img.fadeIn(100);
-        });
-    });
+    // The initial
+    initializeGame();
 
     // Create the timer
     var startTime = _.now();
@@ -80,8 +19,15 @@ $(document).ready(function(){
 
     // Create a listener for the reset/new game button
     $('#reset-button').click(function(){
-        window.location.reload();
+        initializeGame();
     });
+
+    // Create a listener for the reset/new game button
+    $('#start-button').click(function(){
+        playGame();
+    });
+
+
 
     // Create a listener for the start game button
 
@@ -119,3 +65,138 @@ $(document).ready(function(){
     // allowed for a given screen element, as well as the result of the player's last action.
 
 });
+
+/*
+ * initializeGame() processes all the steps you need to start a game
+ */
+function initializeGame() {
+    // Clear the game baord
+    $('#game-board').empty();
+
+    // Reset the values in the score board
+    initializeScoreBoard();
+
+    // Create the playing deck
+    var playingDeck = createDeck();
+
+    // Create the playing board
+    createBoard(playingDeck);
+};
+
+/*
+ * initializeScoreBoard()
+ */
+function initializeScoreBoard() {
+    // Erase any previous values and display initial values
+    $('#time').empty();
+    $('#time').text('0');
+
+    $('#matches').empty();
+    $('#matches').text('0');
+
+    $('#remaining').empty();
+    $('#remaining').text('8');
+
+    $('#missed').empty();
+    $('#missed').text('0');
+}
+
+
+/*
+ * reateDeck() creates and shuffles a new playing deck
+ */
+function createDeck() {
+    // select a random set of 8 tiles from the full set of 32 tiles.
+    var tiles = [];
+    var idx;
+
+    // Create all of the potential playing cards
+    for(idx = 1; idx <= 32; ++idx){
+        tiles.push({
+            tileNum: idx,
+            src: 'img/tile' + idx + '.jpg'
+        });
+    }
+
+    // Create a new "shuffled" set of those cards
+    var shuffledTiles = _.shuffle(tiles);
+
+    // Select the first eight cards in that set
+    var selectedTiles = shuffledTiles.slice(0, 8);
+
+    // Create the set of "paired" cards that will be used for playing
+    var tilePairs = [];
+    _.forEach(selectedTiles, function(tile){
+        tilePairs.push(_.clone(tile));
+        tilePairs.push(_.clone(tile));
+    });
+
+    // Shuffle the playing set
+    return _.shuffle(tilePairs);
+}
+
+/*
+ * createBoard() creates the playing board
+ */
+function createBoard(tiles) {
+    // Dynamically create the game board
+    var board = $('#game-board');
+    var row = $(document.createElement('div'));
+    var img;
+    _.forEach(tiles, function(tile, elemIndex){
+
+        if(elemIndex > 0 && 0 == elemIndex %4){
+            board.append(row);
+            row = $(document.createElement('div'));
+        };
+       img = $(document.createElement('img'));
+        img.attr({
+            src: 'img/tile-back.png',
+            alt: 'image of tile ' + tile.tileNum
+        });
+        img.data('tile', tile);
+        row.append(img);
+    });
+    board.append(row);
+
+}
+
+/*
+ * playGame() allows the user to play the game
+ */
+function playGame() {
+    // Declare variables
+    var matches = 0;
+    var remaining = 8;
+    var missed = 0;
+    var firstTile;
+    var secondTile;
+
+    // Register the click event for the card images
+    $('#game-board img').click(function(){
+       var img = $(this);
+       var tile = img.data('tile');
+
+       img.fadeOut(100, function(){
+            if(tile.flipped){
+                img.attr('src', 'img/tile-back.png');
+            }else{
+                img.attr('src', tile.src);
+            }
+            tile.flipped = !tile.flipped;
+            img.fadeIn(100);
+        });
+    });
+    
+
+    /*Start the game loop
+    while(matches <= 8){
+
+        // have turn
+    }
+    */
+}
+
+
+
+
