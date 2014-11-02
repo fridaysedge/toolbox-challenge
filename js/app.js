@@ -1,58 +1,46 @@
+"use strict";
 
 // Declare the game variables
 var matches = 0;
 var remaining = 8;
 var missed = 0;
+var timer;
 var turnOneTile;
 var turnOneImage;
 
-$(document).ready(function(){
-    
 
-    // The initial
+$(document).ready(function(){
+    // Initialize the game for the first time
     initializeGame();
 
-    // Create the timer
-    /*
-    var startTime = _.now();
-    var timer = window.setInterval(function(){
-        var elapsedSeconds = Math.floor((_.now() - startTime) / 1000);
-        $('#elapsed-seconds').text(elapsedSeconds);
-
-        if (elapsedSeconds > 10) {
-            window.clearInterval(timer);
-        }
-
-    }, 1000);
-
-*/
-
     // Create a listener for the reset/new game button
-    $('#reset-button').click(function(){
-        initializeGame();
+    $('#new-game').click(function(){
+        // is the game running?
+        if(timer){
+            // If true, then ask the player is they are sure that they want to re-start
+            $('#restart-modal').modal("show");
+            $('.modal-backdrop').removeClass('modal-backdrop');
+        }else{
+            // Re-initialize the game and play
+            initializeGame();
+            playGame();
+        }
     });
 
-    // Create a listener for the reset/new game button
-    $('#start-button').click(function(){
+    // Create a listener for the directions button
+    $('#directions').click(function(){
+        $('#directions-modal').modal("show");
+        $('.modal-backdrop').removeClass('modal-backdrop');
+    });
+
+    // Create a listener for the modal restart button
+    $('#restart-yes-button').click(function(){
+        // Re-initialize the game and play
+        initializeGame();
         playGame();
-
-        var startTime = _.now();
-        var timer = window.setInterval(function(){
-            var elapsedSeconds = Math.floor((_.now() - startTime) / 1000);
-            $('#time').text(elapsedSeconds);
-        }, 1000);
-        });
-
-
-    // At the end of the game, you should congratulate the winner with some kind of message, icon, or animation.
-
-    // give the player instructions on how to play the game in some form. This can be a separate page,
-    // linked to from the main game page, so that it remains unobtrusive. Or it can be more real-time
-    // help using something like Bootstrap popovers.
-
-    // Remember to give the player proper feedback that lets the player know what kind of actions are
-    // allowed for a given screen element, as well as the result of the player's last action.
-
+        // hide the restart modal
+        $('#restart-modal').modal("hide");
+    });
 });
 
 /*
@@ -77,28 +65,19 @@ function initializeGame() {
  */
 function initializeScoreBoard() {
     // Erase any previous values and display initial values
-    $('#time').empty();
-    $('#time').text('0');
+    matches = 0;
+    remaining = 8;
+    missed = 0;
 
-    $('#matches').empty();
-    $('#matches').text('0');
-
-    $('#remaining').empty();
-    $('#remaining').text('8');
-
-    $('#missed').empty();
-    $('#missed').text('0');
-}
-
-/*
- * modifyScoreBoard()
- */
-function modifyScoreBoard() {
     $('#matches').text(matches);
     $('#remaining').text(remaining);
     $('#missed').text(missed);
-}
 
+    if(timer){
+        window.clearInterval(timer);
+        $('#time').text('0');
+    };
+};
 
 /*
  * reateDeck() creates and shuffles a new playing deck
@@ -115,7 +94,7 @@ function createDeck() {
             src: 'img/tile' + idx + '.jpg',
             playable: true
         });
-    }
+    };
 
     // Create a new "shuffled" set of those cards
     var shuffledTiles = _.shuffle(tiles);
@@ -132,7 +111,7 @@ function createDeck() {
 
     // Shuffle the playing set
     return _.shuffle(tilePairs);
-}
+};
 
 /*
  * createBoard() creates the playing board
@@ -158,7 +137,7 @@ function createBoard(tiles) {
     });
     board.append(row);
 
-}
+};
 
 /*
  * playGame() allows the user to play the game
@@ -166,17 +145,9 @@ function createBoard(tiles) {
 function playGame() {
 
     $('#game-board img').on("click",function(){
-        console.log('**** BEGIN CLICK EVENT ****');
-        console.log('');
         // Collect the information about this tile
         var img = $(this);
         var tile = img.data('tile');
-
-        console.log('tile at the beginging of the click event');
-        console.log(tile);
-        console.log('tile stored in: turnOneTile');
-        console.log(turnOneTile);
-        console.log('');
 
         // Is this the first turn (has turnOneTile been set)?
         if(!turnOneTile && tile.playable){
@@ -190,13 +161,6 @@ function playGame() {
             turnOneImage = img;
             turnOneTile = tile;
 
-            console.log('');
-            console.log('tile inside: if(!turnOneTile && tile.playable)');
-            console.log(tile);
-            console.log('tile stored in: turnOneTile');
-            console.log(turnOneTile);
-            console.log('');
-
         }else if(tile.playable){
             // Otherwise, its the second turn, flip the second tile over
             img.attr('src', tile.src);
@@ -206,18 +170,13 @@ function playGame() {
             
             // Does this tile equal the first tile?
             if(tile.tileNum == turnOneTile.tileNum){
-                // If true, modify the score board
+                // If true reset the turnOne info
                 turnOneImage = null;
                 turnOneTile = null;
+                // Update the scoreboard
                 matches++;
                 remaining--;
-                modifyScoreBoard();
-
-                console.log('tile inside: if(tile.tileNum == turnOneTile.tileNum))');
-                console.log(tile);
-                console.log('tile stored in: turnOneTile');
-                console.log(turnOneTile);
-                console.log('');
+                updateScoreBoard();
 
             }else{
                 // Otherwise, turn the tiles back over and reset them after 1 second
@@ -235,51 +194,56 @@ function playGame() {
                     turnOneImage = null;
                     turnOneTile = null;
 
+                    // Update the scoreboard
                     missed++;
-                    modifyScoreBoard();
+                    updateScoreBoard();
 
                 }, 1000);
 
-                console.log('tile inside: the else of if(tile.tileNum == turnOneTile.tileNum))');
-                console.log(tile);
-                console.log('tile stored in: turnOneTile');
-                console.log(turnOneTile);
-                console.log('');
             }
         }
 
-        
+        // Has the game been won?
+        if(matches == 8){
+            $('#win-modal').modal("show");
+            $('.modal-backdrop').removeClass('modal-backdrop');
+            $('#win-matches').text(matches);
+            $('#win-seconds').text($('#time').text());
+            $('#win-missed').text(missed);
+            
+            // Wait for 5 seconds before you initalize the game
+            window.setTimeout(function(){
+                initializeGame();
+            }, 5000);
+            
+        };
 
-        console.log('**** END CLICK EVENT ****');
     });
-
-
+    
+    // Start the game clock
+    startClock();
 };
 
-function makeMove(){
-
-
+/*
+ * updateScoreBoard() updates the scoreboard
+ */
+function updateScoreBoard() {
+    $('#matches').text(matches);
+    $('#remaining').text(remaining);
+    $('#missed').text(missed);
+};
 
 /*
-    // Register the click event for the card images
-    $('#game-board img').click(function(){
-       var img = $(this);
-       var tile = img.data('tile');
-
-       img.fadeOut(100, function(){
-            if(tile.flipped){
-                img.attr('src', 'img/tile-back.png');
-            }else{
-                img.attr('src', tile.src);
-            }
-            tile.flipped = !tile.flipped;
-            img.fadeIn(100);
-        });
-    });
-
-*/
-
-
-}
-
-
+ * startClock() starts the game clock
+ */
+function startClock(){
+    var startTime = _.now();
+    timer = window.setInterval(function(){
+        var elapsedSeconds = Math.floor((_.now() - startTime) / 1000);
+        $('#time').text(elapsedSeconds);
+        
+        if (matches == 8) {
+            window.clearInterval(timer);
+        };
+    }, 1000);
+};

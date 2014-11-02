@@ -3,8 +3,17 @@
     width: 100px;
     height: 100px;
     margin: 5px;
+    border: 1px solid #999999;
 }
 
-p span {
+#game-board img:hover {
+	opacity: 0.75;
+}
+
+#scoreboard {
+	margin: 10px 0px 0px 5px;
+}
+
+#scoreboard span {
 	margin: 0px 15px 0px 15px;
 }

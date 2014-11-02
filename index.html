@@ -7,20 +7,85 @@
         <link rel="stylesheet" href="css/main.css"/>
     </head>
     <body>
-        <h1>Memory!</h1>
+        <main class="container" id="top">
+            <div class="nav-placeholder"></div>
+            <section>
+                <h1>Memory!</h1>
 
-        <button type="button" id="start-button" class="btn btn-default">Start</button>
+                <button type="button" id="new-game" class="btn btn-default">New Game</button>
+                <button type="button" id="directions" class="btn btn-default">Directions</button>
 
-        <p>matches:<span id="matches">0</span>remaining:<span id="remaining">0</span>missed:<span id="missed">0</span>time:<span id="time">0</span></p>
+                <p id='scoreboard'>matches:<span id="matches">0</span>remaining:<span id="remaining">0</span>missed:<span id="missed">0</span>time:<span id="time">0</span></p>
 
-        <p id="elapsed-seconds"></p>
+                <p id="elapsed-seconds"></p>
 
-        <div id="game-board"></div>
-        
-        <button type="button" id="reset-button" class="btn btn-default">New Game</button>
+                <div id="game-board"></div>
+            </section>
+        </main>
 
+        <div class="modal fade" id="directions-modal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">How to Play Memory</h4>
+                    </div>
+                    <div class="modal-body">
+
+                        <ol>
+                            <li>Press the "New Game" Button.</li>
+                            <li>Select any two tiles on the game board.</li>
+                            <li>If the two cards match, they stay face up.</li>
+                            <li>If they don't match, they get turned back over.</li>
+                            <li>Remember what was on each card and where it was.</li>
+                            <li>The game is over when all the cards have been matched.</li>
+                            <li>You can restart a game at any time by pressing the "New Game" button.</li>
+                        </ol>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">OK, Got it</button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
+
+        <div class="modal fade" id="win-modal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Congratualations, You Win!</h4>
+                    </div>
+                    <div class="modal-body">
+
+                        <p>You matched <span id='win-matches'></span> tiles in <span id ='win-seconds'></span> seconds and you only had <span id='win-missed'></span> missed attempts.</p>
+
+                        <p>"Long live Flash. You've saved your Earth. Have a nice day."</p>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Exit</button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
+
+        <div class="modal fade" id="restart-modal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Are you sure that you want to restart?</h4>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" id="restart-yes-button">Yes</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
+   
         <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/2.4.1/lodash.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
         <script src="js/app.js"></script>
     </body>
 </html>
