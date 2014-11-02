@@ -1,4 +1,11 @@
 
+// Declare the game variables
+var matches = 0;
+var remaining = 8;
+var missed = 0;
+var turnOneTile;
+var turnOneImage;
+
 $(document).ready(function(){
     
 
@@ -6,6 +13,7 @@ $(document).ready(function(){
     initializeGame();
 
     // Create the timer
+    /*
     var startTime = _.now();
     var timer = window.setInterval(function(){
         var elapsedSeconds = Math.floor((_.now() - startTime) / 1000);
@@ -17,6 +25,8 @@ $(document).ready(function(){
 
     }, 1000);
 
+*/
+
     // Create a listener for the reset/new game button
     $('#reset-button').click(function(){
         initializeGame();
@@ -25,35 +35,14 @@ $(document).ready(function(){
     // Create a listener for the reset/new game button
     $('#start-button').click(function(){
         playGame();
-    });
 
+        var startTime = _.now();
+        var timer = window.setInterval(function(){
+            var elapsedSeconds = Math.floor((_.now() - startTime) / 1000);
+            $('#time').text(elapsedSeconds);
+        }, 1000);
+        });
 
-
-    // Create a listener for the start game button
-
-
-
-    // Button to start a new game
-
-    // Button to start the current game
-
-    // If the two images are the same, they are matched, and should remain revealed.
-
-    // If they are not the same, both tiles should be flipped back over after 1 second.
-
-    // The game is won when all tiles are matched (facing up).
-
-    // Your code should also keep track of how long the user has been playing,
-
-    // how many matches have been made so far
-
-    // how many pairs remain to be matched
-
-    // how many attempts resulted in failure (no match)
-
-    // These four statistics should be displayed to the player throughout the game
-
-    // with the timer refreshing every second
 
     // At the end of the game, you should congratulate the winner with some kind of message, icon, or animation.
 
@@ -101,6 +90,15 @@ function initializeScoreBoard() {
     $('#missed').text('0');
 }
 
+/*
+ * modifyScoreBoard()
+ */
+function modifyScoreBoard() {
+    $('#matches').text(matches);
+    $('#remaining').text(remaining);
+    $('#missed').text(missed);
+}
+
 
 /*
  * reateDeck() creates and shuffles a new playing deck
@@ -114,7 +112,8 @@ function createDeck() {
     for(idx = 1; idx <= 32; ++idx){
         tiles.push({
             tileNum: idx,
-            src: 'img/tile' + idx + '.jpg'
+            src: 'img/tile' + idx + '.jpg',
+            playable: true
         });
     }
 
@@ -165,13 +164,103 @@ function createBoard(tiles) {
  * playGame() allows the user to play the game
  */
 function playGame() {
-    // Declare variables
-    var matches = 0;
-    var remaining = 8;
-    var missed = 0;
-    var firstTile;
-    var secondTile;
 
+    $('#game-board img').on("click",function(){
+        console.log('**** BEGIN CLICK EVENT ****');
+        console.log('');
+        // Collect the information about this tile
+        var img = $(this);
+        var tile = img.data('tile');
+
+        console.log('tile at the beginging of the click event');
+        console.log(tile);
+        console.log('tile stored in: turnOneTile');
+        console.log(turnOneTile);
+        console.log('');
+
+        // Is this the first turn (has turnOneTile been set)?
+        if(!turnOneTile && tile.playable){
+            // If true then flip the tile over
+            img.attr('src', tile.src);
+            
+            // make the tile unplayable
+            tile.playable = false;
+            
+            // store the tile
+            turnOneImage = img;
+            turnOneTile = tile;
+
+            console.log('');
+            console.log('tile inside: if(!turnOneTile && tile.playable)');
+            console.log(tile);
+            console.log('tile stored in: turnOneTile');
+            console.log(turnOneTile);
+            console.log('');
+
+        }else if(tile.playable){
+            // Otherwise, its the second turn, flip the second tile over
+            img.attr('src', tile.src);
+            
+            // make the tile unplayable
+            tile.playable = false;
+            
+            // Does this tile equal the first tile?
+            if(tile.tileNum == turnOneTile.tileNum){
+                // If true, modify the score board
+                turnOneImage = null;
+                turnOneTile = null;
+                matches++;
+                remaining--;
+                modifyScoreBoard();
+
+                console.log('tile inside: if(tile.tileNum == turnOneTile.tileNum))');
+                console.log(tile);
+                console.log('tile stored in: turnOneTile');
+                console.log(turnOneTile);
+                console.log('');
+
+            }else{
+                // Otherwise, turn the tiles back over and reset them after 1 second
+                setTimeout(function(){
+                    // flip both the tiles back over
+                    img.attr('src', 'img/tile-back.png');
+                    turnOneImage.attr('src', 'img/tile-back.png');
+                    turnOneTile.flipped = !turnOneTile.flipped;
+
+                    // Make the both tiles playable
+                    tile.playable = true;
+                    turnOneTile.playable = true;
+
+                    // clear the stored tile variables
+                    turnOneImage = null;
+                    turnOneTile = null;
+
+                    missed++;
+                    modifyScoreBoard();
+
+                }, 1000);
+
+                console.log('tile inside: the else of if(tile.tileNum == turnOneTile.tileNum))');
+                console.log(tile);
+                console.log('tile stored in: turnOneTile');
+                console.log(turnOneTile);
+                console.log('');
+            }
+        }
+
+        
+
+        console.log('**** END CLICK EVENT ****');
+    });
+
+
+};
+
+function makeMove(){
+
+
+
+/*
     // Register the click event for the card images
     $('#game-board img').click(function(){
        var img = $(this);
@@ -187,16 +276,10 @@ function playGame() {
             img.fadeIn(100);
         });
     });
-    
 
-    /*Start the game loop
-    while(matches <= 8){
+*/
 
-        // have turn
-    }
-    */
+
 }
-
-
 
 
